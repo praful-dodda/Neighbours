@@ -2,3 +2,5 @@
 *.m~
 *.bak
 *.mat
+*.pdf
+*.mlx

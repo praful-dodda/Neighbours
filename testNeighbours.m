@@ -3,7 +3,7 @@
 
 nMS=10000;  % try nMS=100 and nMS=10000
 nMEvec=[5 10 100 250 500 1000 2000];
-nmax=5; % try nMS=2, nMS=10 and nMS=200
+nmax=200; % try nMS=2, nMS=10 and nMS=200
 nanratio_target=0.5;
 dmax=[1000 10000 0.1];
 
@@ -48,18 +48,12 @@ for jj=1:length(nMEvec)
   data.nanratio=nanratio;
   data.sMS=sMS;
   data.tME=tME;
-  data.z_stg=z_stg;
-  data.p_stg=p_stg;
   data.z=z;
   data.p=p;
   data.index_stg_to_stv=index_stg_to_stv;
 
   tic;
-%   [psub_stg,zsub_stg,dsub_stg,nsub_stg,index_stg]=neighbours_stg(p0,data,nmax,dmax);
-  [dsub_stg,nsub_stg,index_stg] = neighbours_index_stg(p0,data,nmax,dmax);
-  psub_stg = data.p(index_stg, :);
-  zsub_stg = data.z(index_stg);
-
+  [psub_stg,zsub_stg,dsub_stg,nsub_stg,index_stg]=neighbours_stg(p0,data,nmax,dmax);
   tCPU_stg(jj)=toc;
   if ~isequal(index_stv,index_stg) || ~isequal(psub_stv,psub_stg) ||  ~isequal(zsub_stv,zsub_stg) ||  ~isequal(dsub_stv,dsub_stg)
     if isequal(sort(index_stv),sort(index_stg)) || isequal(sort(zsub_stv),sort(zsub_stg))
