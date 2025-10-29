@@ -119,6 +119,20 @@ for test_idx = 1:n_tests
         else
             fprintf('    ⚠ Some value discrepancies\n');
         end
+
+        % Compare distance distributions (more robust than exact neighbor matching)
+        fprintf('  Distance Distribution Comparison:\n');
+        [dist_comparison] = compare_distance_distributions(dsub_ref, dsub_opt, dmax);
+        fprintf('    Mean distance diff:  %.6f (%.2f%%)\n', ...
+            dist_comparison.mean_diff, dist_comparison.mean_percent_diff);
+        fprintf('    Median distance diff: %.6f (%.2f%%)\n', ...
+            dist_comparison.median_diff, dist_comparison.median_percent_diff);
+        fprintf('    Distribution KS test: p-value = %.4f', dist_comparison.ks_pvalue);
+        if dist_comparison.ks_pvalue > 0.05
+            fprintf(' ✓ (distributions match)\n');
+        else
+            fprintf(' ⚠ (distributions differ)\n');
+        end
     end
 
     %% Performance comparison
@@ -144,6 +158,12 @@ for test_idx = 1:n_tests
     results(test_idx).time_opt = time_opt;
     results(test_idx).speedup = speedup;
     results(test_idx).match_quality = match_quality;
+    results(test_idx).csub_ref = csub_ref;  % Store for visualization
+    results(test_idx).csub_opt = csub_opt;
+    results(test_idx).p0 = p0;
+    if nsub_ref > 0 && nsub_opt > 0
+        results(test_idx).dist_comparison = dist_comparison;
+    end
 
     fprintf('\n');
 end
@@ -347,4 +367,57 @@ function [match_quality, details] = compare_neighbor_sets(...
     details.matched_opt = matched_opt;
     details.distance_diffs = distance_diffs;
     details.value_diffs = value_diffs;
+end
+
+function [dist_comparison] = compare_distance_distributions(dsub_ref, dsub_opt, dmax)
+    % Compare statistical properties of distance distributions
+    % This is more robust than exact neighbor matching for uniform grids
+
+    dist_comparison = struct();
+
+    % Extract spatial distances (first column)
+    if size(dsub_ref, 2) >= 1
+        spatial_ref = dsub_ref(:, 1);
+        spatial_opt = dsub_opt(:, 1);
+    else
+        spatial_ref = dsub_ref;
+        spatial_opt = dsub_opt;
+    end
+
+    % Compute combined space-time distance
+    if size(dsub_ref, 2) >= 2
+        combined_ref = dsub_ref(:,1) + dmax(3) * dsub_ref(:,2);
+        combined_opt = dsub_opt(:,1) + dmax(3) * dsub_opt(:,2);
+    else
+        combined_ref = spatial_ref;
+        combined_opt = spatial_opt;
+    end
+
+    % Compare means
+    mean_ref = mean(combined_ref);
+    mean_opt = mean(combined_opt);
+    dist_comparison.mean_diff = abs(mean_ref - mean_opt);
+    dist_comparison.mean_percent_diff = 100 * dist_comparison.mean_diff / max(mean_ref, 1e-10);
+
+    % Compare medians
+    median_ref = median(combined_ref);
+    median_opt = median(combined_opt);
+    dist_comparison.median_diff = abs(median_ref - median_opt);
+    dist_comparison.median_percent_diff = 100 * dist_comparison.median_diff / max(median_ref, 1e-10);
+
+    % Compare standard deviations
+    std_ref = std(combined_ref);
+    std_opt = std(combined_opt);
+    dist_comparison.std_diff = abs(std_ref - std_opt);
+
+    % Kolmogorov-Smirnov test (tests if distributions are from same continuous distribution)
+    [~, dist_comparison.ks_pvalue] = kstest2(combined_ref, combined_opt);
+
+    % Store raw stats
+    dist_comparison.mean_ref = mean_ref;
+    dist_comparison.mean_opt = mean_opt;
+    dist_comparison.median_ref = median_ref;
+    dist_comparison.median_opt = median_opt;
+    dist_comparison.std_ref = std_ref;
+    dist_comparison.std_opt = std_opt;
 end

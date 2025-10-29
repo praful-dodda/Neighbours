@@ -92,10 +92,18 @@ rt_max = ceil(dmax(2) / abs(dt));
 % Estimate candidate search volume
 candidate_volume = (2*rx_max + 1) * (2*ry_max + 1) * (2*rt_max + 1);
 
-% Choose search strategy based on volume
-% Shell expansion is better for large sparse grids
-% Direct index search is simpler for small volumes
-use_shell_expansion = (candidate_volume > 1000) || (nmax < 0.1 * candidate_volume);
+% Estimate data sparsity (NaN ratio)
+sample_size = min(1000, numel(data.Z));
+sample_indices = randperm(numel(data.Z), sample_size);
+estimated_nanratio = sum(isnan(data.Z(sample_indices))) / sample_size;
+
+% Choose search strategy based on volume AND sparsity
+% Shell expansion is inefficient for extremely sparse data (>90% NaN)
+% because it wastes time searching empty shells
+% Direct index search is better for sparse data or small volumes
+use_shell_expansion = (candidate_volume > 1000) && ...
+                      (nmax < 0.1 * candidate_volume) && ...
+                      (estimated_nanratio < 0.9);  % NOT very sparse
 
 %% Main search algorithm
 if use_shell_expansion
@@ -173,8 +181,11 @@ temporal_dist = temporal_dist(valid_idx);
 % Compute combined space-time distance
 spacetime_dist = spatial_dist + dmax(3) * temporal_dist;
 
-% Sort by space-time distance and select top nmax
-[~, sort_idx] = sort(spacetime_dist);
+% Sort by space-time distance with deterministic tie-breaking
+% For testing: use grid indices as secondary sort keys for consistent ordering
+% This ensures reproducible results when multiple neighbors are equidistant
+sort_matrix = [spacetime_dist, candidates_ix, candidates_iy, candidates_it];
+[~, sort_idx] = sortrows(sort_matrix);
 n_return = min(nmax, length(sort_idx));
 select_idx = sort_idx(1:n_return);
 

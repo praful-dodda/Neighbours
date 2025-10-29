@@ -58,6 +58,7 @@ p0 = [-95, 27.5, 100];  % [lon, lat, time]
 - **`speed_test_comparison.m`** - **NEW!** Detailed speed benchmarks with multiple iterations
 - **`visualize_performance.m`** - **NEW!** Generate performance visualization plots
 - **`visualize_accuracy.m`** - **NEW!** Generate accuracy comparison plots
+- **`visualize_neighbor_selection.m`** - **NEW!** Visualize data and selected neighbors with overlap analysis
 - **`test_neighbours_stug_optimized.m`** - Comprehensive correctness tests
 - **`benchmark_neighbours_stug.m`** - Performance benchmarks (optimized only)
 - `test_neighbours_stg.m` - Tests for station×time format
@@ -180,7 +181,19 @@ visualize_accuracy
 - Accuracy vs performance trade-off
 - Saves 4 PNG files showing correctness metrics
 
-### 6. Basic Performance Check
+### 6. Neighbor Selection Visualization
+```matlab
+visualize_neighbor_selection
+```
+**Generates spatial visualizations of neighbor selection (requires compare_neighbours_implementations.m results):**
+- 2D spatial view (lon-lat slice) showing selected neighbors
+- 3D space-time view with connection lines
+- Overlap analysis (common, ref-only, opt-only neighbors)
+- Distance distribution histograms and CDFs
+- Q-Q plots and statistical comparisons
+- Saves 3 PNG files per test case
+
+### 7. Basic Performance Check
 ```matlab
 benchmark_neighbours_stug
 ```
