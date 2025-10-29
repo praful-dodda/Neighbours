@@ -54,8 +54,11 @@ p0 = [-95, 27.5, 100];  % [lon, lat, time]
 - `neighbours_stg_v3.m` - Additional edge case fixes
 
 ### Test Scripts
+- **`compare_neighbours_implementations.m`** - **NEW!** Direct comparison between optimized and reference implementations
+- **`speed_test_comparison.m`** - **NEW!** Detailed speed benchmarks with multiple iterations
+- **`visualize_performance.m`** - **NEW!** Generate performance visualization plots
 - **`test_neighbours_stug_optimized.m`** - Comprehensive correctness tests
-- **`benchmark_neighbours_stug.m`** - Performance benchmarks
+- **`benchmark_neighbours_stug.m`** - Performance benchmarks (optimized only)
 - `test_neighbours_stg.m` - Tests for station×time format
 - `testNeighbours.m` / `testNeighbours_nonan.m` - Original test scripts
 
@@ -121,22 +124,55 @@ See `QUICK_REFERENCE.md` for detailed comparison of all functions.
 
 ## Testing
 
-### Correctness Testing
+### 1. Correctness Testing
 ```matlab
 test_neighbours_stug_optimized
 ```
-Tests:
+Standalone tests for the optimized implementation:
 - Basic functionality
 - Edge cases (corners, boundaries)
 - Various NaN ratios (0% to 99%)
 - Distance constraint enforcement
 - Sorting verification
 
-### Performance Benchmarking
+### 2. Direct Comparison Test
+```matlab
+compare_neighbours_implementations
+```
+**Compares neighbours_stug_optimized.m vs neighbours.m:**
+- Validates that both find the same neighbors
+- Compares distances and values
+- Measures speedup for each scenario
+- Tests 5+ different grid configurations
+- Detailed match quality analysis
+
+### 3. Speed Benchmarking
+```matlab
+speed_test_comparison
+```
+**Detailed performance comparison:**
+- Multiple iterations (5+) per scenario for reliable timing
+- Tests 6 different grid sizes and NaN ratios
+- Shows speedup from small to very large grids
+- Statistical analysis (mean, median, std dev)
+- Scaling analysis and memory estimates
+- Saves results to `speed_test_results.mat`
+
+### 4. Visualization
+```matlab
+visualize_performance
+```
+**Generates performance plots (requires speed_test_comparison.m results):**
+- Execution time comparison charts
+- Speedup analysis graphs
+- Throughput metrics
+- Saves 4 PNG files for documentation
+
+### 5. Basic Performance Check
 ```matlab
 benchmark_neighbours_stug
 ```
-Benchmarks:
+Quick benchmarks for the optimized version only:
 - Scalability with grid size
 - Performance vs NaN ratio
 - Effect of nmax and dmax parameters
