@@ -25,6 +25,7 @@ test_configs = {
     struct('name', 'Large Grid - 24 months (30% NaN)', 'nx', 200, 'ny', 200, 'nt', 24, 'nan_ratio', 0.3, 'nmax', 25)
     struct('name', 'Very Sparse - 24 months (95% NaN)', 'nx', 150, 'ny', 150, 'nt', 24, 'nan_ratio', 0.95, 'nmax', 10)
     struct('name', 'Very Large Grid - 24 months (50% NaN)', 'nx', 300, 'ny', 300, 'nt', 24, 'nan_ratio', 0.5, 'nmax', 30)
+    struct('name', 'Very Large Grid - 24 months (0% NaN)', 'nx', 300, 'ny', 300, 'nt', 24, 'nan_ratio', 0, 'nmax', 30)
 };
 
 % Storage for results
