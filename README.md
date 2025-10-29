@@ -57,6 +57,7 @@ p0 = [-95, 27.5, 100];  % [lon, lat, time]
 - **`compare_neighbours_implementations.m`** - **NEW!** Direct comparison between optimized and reference implementations
 - **`speed_test_comparison.m`** - **NEW!** Detailed speed benchmarks with multiple iterations
 - **`visualize_performance.m`** - **NEW!** Generate performance visualization plots
+- **`visualize_accuracy.m`** - **NEW!** Generate accuracy comparison plots
 - **`test_neighbours_stug_optimized.m`** - Comprehensive correctness tests
 - **`benchmark_neighbours_stug.m`** - Performance benchmarks (optimized only)
 - `test_neighbours_stg.m` - Tests for station×time format
@@ -158,7 +159,7 @@ speed_test_comparison
 - Scaling analysis and memory estimates
 - Saves results to `speed_test_results.mat`
 
-### 4. Visualization
+### 4. Performance Visualization
 ```matlab
 visualize_performance
 ```
@@ -168,7 +169,18 @@ visualize_performance
 - Throughput metrics
 - Saves 4 PNG files for documentation
 
-### 5. Basic Performance Check
+### 5. Accuracy Visualization
+```matlab
+visualize_accuracy
+```
+**Generates accuracy comparison plots (requires compare_neighbours_implementations.m results):**
+- Match quality analysis (% of neighbors that match)
+- Distance accuracy (max error in computed distances)
+- Value accuracy (max error in data values)
+- Accuracy vs performance trade-off
+- Saves 4 PNG files showing correctness metrics
+
+### 6. Basic Performance Check
 ```matlab
 benchmark_neighbours_stug
 ```

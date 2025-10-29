@@ -11,12 +11,12 @@ clear; close all;
 
 fprintf('=== Performance Benchmark: neighbours_stug ===\n\n');
 
-%% Benchmark 1: Medium-sized grid (typical soft data scenario)
-fprintf('Benchmark 1: Medium grid (100x100x100, 30%% NaN)...\n');
+%% Benchmark 1: Medium-sized grid (typical global monthly soft data scenario)
+fprintf('Benchmark 1: Medium grid (100x100x24, 30%% NaN)...\n');
 
 nx = 100;
 ny = 100;
-nt = 100;
+nt = 24;  % 24 months
 
 % Create uniform grid
 grid_data.x = linspace(-100, -80, nx)';
@@ -71,12 +71,13 @@ fprintf('  Benchmark 1 completed\n\n');
 %% Benchmark 2: Scalability with grid size
 fprintf('Benchmark 2: Scalability with increasing grid size...\n');
 
+% Realistic global monthly data dimensions: high spatial, low temporal
 grid_sizes = [
-    30, 30, 30;
-    50, 50, 50;
-    70, 70, 70;
-    100, 100, 100;
-    150, 150, 100;
+    50, 50, 12;      % Small: ~2500 spatial points, 1 year
+    100, 100, 24;    % Medium: ~10k spatial points, 2 years
+    150, 150, 24;    % Large: ~22k spatial points, 2 years
+    200, 200, 24;    % Very large: ~40k spatial points, 2 years
+    300, 300, 24;    % Global-scale: ~90k spatial points, 2 years
 ];
 
 times_scale = zeros(size(grid_sizes, 1), 1);
@@ -119,9 +120,9 @@ fprintf('  Scalability test completed\n\n');
 %% Benchmark 3: Performance vs NaN ratio
 fprintf('Benchmark 3: Performance with varying NaN ratios...\n');
 
-nx = 80;
-ny = 80;
-nt = 80;
+nx = 150;
+ny = 150;
+nt = 24;  % 24 months
 
 grid_base.x = linspace(-100, -80, nx)';
 grid_base.y = linspace(25, 35, ny)';
@@ -169,9 +170,9 @@ fprintf('  NaN ratio test completed\n\n');
 %% Benchmark 4: Different nmax values
 fprintf('Benchmark 4: Performance with varying nmax...\n');
 
-nx = 100;
-ny = 100;
-nt = 100;
+nx = 150;
+ny = 150;
+nt = 24;  % 24 months
 
 grid_nmax.x = linspace(-100, -80, nx)';
 grid_nmax.y = linspace(25, 35, ny)';

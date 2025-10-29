@@ -9,14 +9,19 @@ clear; close all;
 fprintf('=== Speed Test: neighbours_stug_optimized vs neighbours.m ===\n\n');
 
 %% Test scenarios
+% Realistic scenarios for global monthly soft data:
+% - Global grids typically: 0.5-1 degree resolution = 360x180 to 720x360
+% - Monthly data: 12-24 months typical
+% - High spatial, low temporal dimensions
+
 scenarios = {
     % [nx, ny, nt, nan_ratio, nmax, description]
-    {40,  40,  24,  0.1,  15, 'Small grid, low NaN'}
-    {50,  50,  24,  0.3,  20, 'Medium grid, 30%% NaN'}
-    {70,  70,  24,  0.5,  20, 'Medium grid, 50%% NaN'}
-    {100, 100, 24, 0.3,  25, 'Large grid, 30%% NaN'}
-    {100, 100, 24, 0.7,  25, 'Large grid, 70%% NaN (sparse)'}
-    {150, 150, 24, 0.5,  30, 'Very large grid'}
+    {50,  50,  12, 0.1,  15, 'Small grid - 1 year, low NaN'}
+    {100, 100, 24, 0.3,  20, 'Medium grid - 2 years, 30%% NaN'}
+    {150, 150, 24, 0.5,  20, 'Large grid - 2 years, 50%% NaN'}
+    {200, 200, 24, 0.3,  25, 'Very large - 2 years, 30%% NaN'}
+    {200, 200, 18, 0.7,  25, 'Very large - 18 months, sparse (70%% NaN)'}
+    {300, 300, 24, 0.5,  30, 'Global-scale grid (300x300x24)'}
 };
 
 n_scenarios = length(scenarios);
