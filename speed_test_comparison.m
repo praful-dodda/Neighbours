@@ -11,12 +11,12 @@ fprintf('=== Speed Test: neighbours_stug_optimized vs neighbours.m ===\n\n');
 %% Test scenarios
 scenarios = {
     % [nx, ny, nt, nan_ratio, nmax, description]
-    {40,  40,  40,  0.1,  15, 'Small grid, low NaN'}
-    {50,  50,  50,  0.3,  20, 'Medium grid, 30%% NaN'}
-    {70,  70,  70,  0.5,  20, 'Medium grid, 50%% NaN'}
-    {100, 100, 100, 0.3,  25, 'Large grid, 30%% NaN'}
-    {100, 100, 100, 0.7,  25, 'Large grid, 70%% NaN (sparse)'}
-    {150, 150, 100, 0.5,  30, 'Very large grid'}
+    {40,  40,  24,  0.1,  15, 'Small grid, low NaN'}
+    {50,  50,  24,  0.3,  20, 'Medium grid, 30%% NaN'}
+    {70,  70,  24,  0.5,  20, 'Medium grid, 50%% NaN'}
+    {100, 100, 24, 0.3,  25, 'Large grid, 30%% NaN'}
+    {100, 100, 24, 0.7,  25, 'Large grid, 70%% NaN (sparse)'}
+    {150, 150, 24, 0.5,  30, 'Very large grid'}
 };
 
 n_scenarios = length(scenarios);

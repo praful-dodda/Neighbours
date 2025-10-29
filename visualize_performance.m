@@ -142,6 +142,9 @@ fprintf('  Saved: performance_metrics.png\n');
 figure('Position', [250, 250, 600, 400]);
 axis off;
 
+% Find the best scenario index before building the summary text
+idx_best = find(speedups == max(speedups), 1);
+
 summary_text = {
     '\bf Performance Summary Statistics'
     ''
@@ -157,7 +160,6 @@ summary_text = {
     sprintf('  Average reduction:  %.1f%%', mean(percent_reduction))
     ''
     '\bf Best Performance:'
-    [idx_best, ~] = find(speedups == max(speedups), 1);
     sprintf('  Scenario: %s', descriptions{idx_best})
     sprintf('  Speedup:  %.2fx', speedups(idx_best))
     sprintf('  From %.4fs to %.4fs', times_ref(idx_best), times_opt(idx_best))

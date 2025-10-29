@@ -14,11 +14,12 @@ fprintf('=== Comparison: neighbours_stug_optimized vs neighbours.m ===\n\n');
 
 %% Test Configuration
 test_configs = {
-    struct('name', 'Small Dense Grid', 'nx', 30, 'ny', 30, 'nt', 30, 'nan_ratio', 0.1, 'nmax', 15)
-    struct('name', 'Medium Grid 30%% NaN', 'nx', 50, 'ny', 50, 'nt', 50, 'nan_ratio', 0.3, 'nmax', 20)
-    struct('name', 'Medium Grid 70%% NaN', 'nx', 50, 'ny', 50, 'nt', 50, 'nan_ratio', 0.7, 'nmax', 20)
-    struct('name', 'Large Grid', 'nx', 100, 'ny', 100, 'nt', 100, 'nan_ratio', 0.3, 'nmax', 25)
-    struct('name', 'Very Sparse Grid', 'nx', 80, 'ny', 80, 'nt', 80, 'nan_ratio', 0.95, 'nmax', 10)
+    struct('name', 'Small Dense Grid (10% NaN)', 'nx', 30, 'ny', 30, 'nt', 30, 'nan_ratio', 0.1, 'nmax', 15)
+    struct('name', 'Medium Grid (30% NaN)', 'nx', 50, 'ny', 50, 'nt', 50, 'nan_ratio', 0.3, 'nmax', 20)
+    struct('name', 'Medium Grid (70% NaN)', 'nx', 50, 'ny', 50, 'nt', 50, 'nan_ratio', 0.7, 'nmax', 20)
+    struct('name', 'Large Grid (30% NaN)', 'nx', 100, 'ny', 100, 'nt', 100, 'nan_ratio', 0.3, 'nmax', 25)
+    struct('name', 'Very Sparse Grid (95% NaN)', 'nx', 80, 'ny', 80, 'nt', 80, 'nan_ratio', 0.95, 'nmax', 10)
+    struct('name', 'Very Large Grid (0% NaN)', 'nx', 150, 'ny', 150, 'nt', 100, 'nan_ratio', 0.0, 'nmax', 25)
 };
 
 % Storage for results
