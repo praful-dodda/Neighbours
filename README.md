@@ -4,15 +4,18 @@ This repository contains MATLAB implementations of optimized algorithms to find 
 
 ## Overview
 
-Three main neighbor search strategies for different data structures:
+Four main neighbor search strategies for different data structures:
 
 1. **`neighbours.m`** - General algorithm for arbitrary point clouds (space-time vector format)
 2. **`neighbours_stg.m`** - Optimized for monitoring station × time grids
-3. **`neighbours_stug_optimized.m`** - **NEW!** Highly optimized for uniformly gridded space-time data
+3. **`neighbours_stug_optimized.m`** - Highly optimized for uniformly gridded space-time data (adaptive strategy)
+4. **`neighbours_stug_index.m`** - **NEW!** Index-based search with NO distance calculations during search
 
 ## Quick Start
 
 ### For Uniform Grids (Satellite/Model Data)
+
+**Option 1: Adaptive strategy (optimized)**
 ```matlab
 % Setup uniform grid
 grid_data.x = linspace(-100, -90, 100)';
@@ -26,6 +29,13 @@ grid_data.Z = your_data;  % 100×100×200 array
 % Find neighbors
 p0 = [-95, 27.5, 100];  % [lon, lat, time]
 [psub, zsub, dsub, nsub] = neighbours_stug_optimized(p0, grid_data, 20, [2.0, 10.0, 0.1]);
+```
+
+**Option 2: Index-based search (minimal distance calculations)**
+```matlab
+% Uses pure index arithmetic during search
+% Only computes distances at the end for output
+[psub, zsub, dsub, nsub] = neighbours_stug_index(p0, grid_data, 20, [2.0, 10.0, 0.1]);
 ```
 
 ### For Monitoring Stations
@@ -45,7 +55,8 @@ p0 = [-95, 27.5, 100];  % [lon, lat, time]
 ### Main Functions
 - **`neighbours.m`** - Space-time vector (STV) format neighbor selection
 - **`neighbours_stg.m`** - Space-time grid (STG) format for station networks
-- **`neighbours_stug_optimized.m`** - **NEW!** Optimized for uniform grids (STUG format)
+- **`neighbours_stug_optimized.m`** - Optimized for uniform grids with adaptive strategy
+- **`neighbours_stug_index.m`** - **NEW!** Index-based search for uniform grids (pure index arithmetic)
 
 ### Original/Legacy
 - `neighbours_stug.m` - Original uniform grid implementation (baseline)
@@ -54,17 +65,22 @@ p0 = [-95, 27.5, 100];  % [lon, lat, time]
 - `neighbours_stg_v3.m` - Additional edge case fixes
 
 ### Test Scripts
-- **`compare_neighbours_implementations.m`** - **NEW!** Direct comparison between optimized and reference implementations
-- **`speed_test_comparison.m`** - **NEW!** Detailed speed benchmarks with multiple iterations
-- **`visualize_performance.m`** - **NEW!** Generate performance visualization plots
-- **`visualize_accuracy.m`** - **NEW!** Generate accuracy comparison plots
-- **`visualize_neighbor_selection.m`** - **NEW!** Visualize data and selected neighbors with overlap analysis
-- **`test_neighbours_stug_optimized.m`** - Comprehensive correctness tests
+- **`test_neighbours_stug_index.m`** - **NEW!** Comprehensive tests for index-based implementation
+- **`compare_stug_methods.m`** - **NEW!** Compare all three STUG methods (reference, optimized, index-based)
+- **`verify_no_distance_calculations.m`** - **NEW!** Verify that index-based method has no distance calcs during search
+- **`compare_neighbours_implementations.m`** - Direct comparison between optimized and reference implementations
+- **`speed_test_comparison.m`** - Detailed speed benchmarks with multiple iterations
+- **`visualize_performance.m`** - Generate performance visualization plots
+- **`visualize_accuracy.m`** - Generate accuracy comparison plots
+- **`visualize_neighbor_selection.m`** - Visualize data and selected neighbors with overlap analysis
+- **`test_neighbours_stug_optimized.m`** - Comprehensive correctness tests for optimized version
 - **`benchmark_neighbours_stug.m`** - Performance benchmarks (optimized only)
 - `test_neighbours_stg.m` - Tests for station×time format
 - `testNeighbours.m` / `testNeighbours_nonan.m` - Original test scripts
 
 ### Documentation
+- **`STUG_INDEX_ALGORITHM.md`** - **NEW!** Detailed explanation of index-based algorithm
+- **`TESTING_GUIDE.md`** - **NEW!** Comprehensive guide for running and interpreting tests
 - **`OPTIMIZATION_GUIDE.md`** - Detailed explanation of optimization strategy
 - **`QUICK_REFERENCE.md`** - Quick lookup guide for all functions
 - **`README.md`** - This file
@@ -97,6 +113,45 @@ Use `neighbours_stug_optimized.m` when:
 - Large grids (>100,000 points)
 - High NaN ratio (>30% missing data)
 - Soft data from satellite/model outputs
+
+## What's New: neighbours_stug_index.m
+
+### Revolutionary Approach: Index-Space Search
+
+**Zero distance calculations during search!**
+
+**Key Innovation:**
+- Works entirely in **index space** (integer grid indices) during search
+- Only computes distances at the very end for output
+- Handles **anisotropic grids** (different dx/dy ratios)
+- **Ellipsoidal space-time expansion** with temporal budget calculation
+
+**Algorithm Highlights:**
+```
+During Search Phase (Step 1-4):
+  ✓ Integer arithmetic only (di, dj, dk)
+  ✓ Grid index calculations (ix, iy, it)
+  ✓ Uses grid spacing (dx, dy, dt) - no coordinate lookups
+  ✓ NO distance calculations
+
+After Search (Step 5):
+  ✗ Extract coordinates for selected candidates
+  ✗ Compute distances (only for nmax points)
+  ✗ Sort and return
+```
+
+**Performance:**
+- Typical: Only 20-30 distance calculations (vs 1000s in other methods)
+- Best for: Moderate to large grids, anisotropic grids
+- Complexity: O(V + nmax log nmax) where V = search volume
+
+**When to Use:**
+- ✓ Strictly uniform grids (constant dx, dy, dt)
+- ✓ Anisotropic grids (dx ≠ dy)
+- ✓ Want minimal distance calculations
+- ✓ Moderate search volumes
+
+See `STUG_INDEX_ALGORITHM.md` for detailed algorithm explanation and verification.
 
 See `QUICK_REFERENCE.md` for detailed comparison of all functions.
 
@@ -193,7 +248,41 @@ visualize_neighbor_selection
 - Q-Q plots and statistical comparisons
 - Saves 3 PNG files per test case
 
-### 7. Basic Performance Check
+### 7. Index-Based Method Tests
+```matlab
+test_neighbours_stug_index
+```
+**Comprehensive tests for the index-based implementation:**
+- Basic functionality on isotropic grids
+- Edge cases (corners, boundaries, outside grid)
+- Anisotropic grids (different dx/dy ratios: 0.25, 0.5, 1.0, 2.0, 4.0)
+- Various NaN ratios (0% to 95%)
+- Dense and sparse data scenarios
+- Empty/all-NaN data handling
+
+### 8. Three-Method Comparison
+```matlab
+compare_stug_methods
+```
+**Compare all three STUG methods side-by-side:**
+- neighbours.m (reference)
+- neighbours_stug_optimized.m (adaptive strategy)
+- neighbours_stug_index.m (index-based)
+- Performance comparison showing which method is fastest
+- Accuracy validation for both optimized methods
+- Saves results to `compare_stug_results.mat`
+
+### 9. Distance Calculation Verification
+```matlab
+verify_no_distance_calculations
+```
+**Verify that index-based method performs NO distance calculations during search:**
+- Code structure analysis (identifies where distance calculations occur)
+- Algorithmic proof (confirms only index arithmetic during search)
+- Visual comparison showing operation counts by phase
+- Creates verification plots saved as PNG
+
+### 10. Basic Performance Check
 ```matlab
 benchmark_neighbours_stug
 ```
@@ -215,11 +304,14 @@ Quick benchmarks for the optimized version only:
 
 ## Function Comparison
 
-| Function | Data Structure | Best For | Memory | Speed |
-|----------|----------------|----------|--------|-------|
-| neighbours.m | Point cloud | General use, irregular points | O(n) | Medium |
-| neighbours_stg.m | Stations × Time | Monitoring networks | O(nMS×nME) | Fast |
-| neighbours_stug_optimized.m | Uniform grid | Satellite/model data | O(nmax) | Very fast |
+| Function | Data Structure | Best For | Memory | Speed | Distance Calcs |
+|----------|----------------|----------|--------|-------|----------------|
+| neighbours.m | Point cloud | General use, irregular points | O(n) | Medium | O(n) |
+| neighbours_stg.m | Stations × Time | Monitoring networks | O(nMS×nME) | Fast | O(nMS) |
+| neighbours_stug_optimized.m | Uniform grid | Satellite/model data, adaptive | O(nmax) | Very fast | O(V) |
+| neighbours_stug_index.m | Uniform grid | Uniform grids, anisotropic grids | O(nmax) | Very fast | O(nmax) only! |
+
+**Key:** V = search volume, typically >> nmax
 
 ## Common Use Cases
 
