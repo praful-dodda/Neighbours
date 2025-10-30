@@ -1,5 +1,5 @@
 % compare_neighbours_implementations.m
-% Comprehensive comparison between neighbours_stug_optimized.m and neighbours.m
+% Comprehensive comparison between neighbours_stug_index.m and neighbours.m
 %
 % This script:
 % 1. Creates test grids with various characteristics
@@ -10,7 +10,7 @@
 
 clear; close all;
 
-fprintf('=== Comparison: neighbours_stug_optimized vs neighbours.m ===\n\n');
+fprintf('=== Comparison: neighbours_stug_index vs neighbours.m ===\n\n');
 
 %% Test Configuration
 % Realistic dimensions for global monthly soft data:
@@ -67,11 +67,11 @@ for test_idx = 1:n_tests
     time_ref = toc;
     fprintf('    Time: %.4f sec, Found: %d neighbors\n', time_ref, nsub_ref);
 
-    %% Call neighbours_stug_optimized.m
-    fprintf('  Running neighbours_stug_optimized.m...\n');
+    %% Call neighbours_stug_index.m
+    fprintf('  Running neighbours_stug_index.m...\n');
     tic;
     [psub_opt, zsub_opt, dsub_opt, nsub_opt, index_opt] = ...
-        neighbours_stug_optimized(p0, grid_data, nmax, dmax);
+        neighbours_stug_index(p0, grid_data, nmax, dmax);
     time_opt = toc;
     fprintf('    Time: %.4f sec, Found: %d neighbors\n', time_opt, nsub_opt);
 

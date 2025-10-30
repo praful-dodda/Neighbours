@@ -63,7 +63,7 @@ for s = 1:n_scenarios
     fprintf('Valid points: %d (%.1f%%)\n', n_valid, 100*(1-nan_ratio));
 
     % Test point (center of grid, middle time)
-    p0 = [0, 0, ceil(nt/2)];
+    p0 = [1, 2, ceil(nt/2)];
     dmax = [5.0, 6.0, 0.5];
 
     fprintf('\nTest point: [%.1f, %.1f, %.1f]\n', p0(1), p0(2), p0(3));
@@ -74,9 +74,11 @@ for s = 1:n_scenarios
 
     % Prepare data in vector format for neighbours.m
     [I, J, K] = ndgrid(1:nx, 1:ny, 1:nt);
-    lon_vec = grid_data.Lon(:);
-    lat_vec = grid_data.Lat(:);
-    time_vec = repmat(grid_data.time, nx*ny, 1);
+    % Expand spatial coordinates to match time dimension so all vectors have
+    % length nx*ny*nt (one entry per space-time point)
+    lon_vec = repmat(grid_data.Lon(:), nt, 1);
+    lat_vec = repmat(grid_data.Lat(:), nt, 1);
+    time_vec = repmat(grid_data.time(:), nx*ny, 1);
     z_vec = grid_data.Z(:);
 
     % Remove NaN values

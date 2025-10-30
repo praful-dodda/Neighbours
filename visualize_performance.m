@@ -6,7 +6,7 @@
 clear; close all;
 
 % Load results from speed test
-if ~exist('speed_test_results.mat', 'file')
+if ~exist('speed_test_results_index.mat', 'file')
     error('Please run speed_test_comparison.m first to generate results');
 end
 

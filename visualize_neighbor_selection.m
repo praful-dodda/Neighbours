@@ -146,10 +146,18 @@ figure('Position', [150, 150, 1200, 900]);
 sample_ratio = min(1, 1000 / sum(~isnan(grid_data.Z(:))));
 subplot(2, 2, 1);
 [ix, iy, it] = ind2sub(size(grid_data.Z), find(~isnan(grid_data.Z)));
-n_sample = floor(length(ix) * sample_ratio);
-sample_idx = randperm(length(ix), n_sample);
+n_sample = max(0, floor(length(ix) * sample_ratio));
+% Guard against zero samples and make sure colors align with sampled points
+if n_sample > 0
+    sample_idx = randperm(length(ix), n_sample);
+    lin_idx = sub2ind(size(grid_data.Z), ix(sample_idx), iy(sample_idx), it(sample_idx));
+    color_vals = grid_data.Z(lin_idx);
+else
+    sample_idx = [];
+    color_vals = [];
+end
 scatter3(grid_data.x(ix(sample_idx)), grid_data.y(iy(sample_idx)), ...
-    grid_data.time(it(sample_idx)), 10, grid_data.Z(~isnan(grid_data.Z)), 'filled', 'MarkerFaceAlpha', 0.3);
+    grid_data.time(it(sample_idx)), 10, color_vals, 'filled', 'MarkerFaceAlpha', 0.3);
 hold on;
 plot3(p0(1), p0(2), p0(3), 'r*', 'MarkerSize', 20, 'LineWidth', 3);
 colorbar;
@@ -358,11 +366,11 @@ if isfield(results(test_idx), 'dist_comparison')
         ''
         sprintf('\\bf KS Test:')
         sprintf('  p-value: %.4f', dc.ks_pvalue)
-        if dc.ks_pvalue > 0.05
-            '  → Distributions match ✓'
-        else
-            '  → Distributions differ'
-        end
+        % if dc.ks_pvalue > 0.05
+        %     '  → Distributions match ✓'
+        % else
+        %     '  → Distributions differ'
+        % end
     };
     text(0.1, 0.9, stats_text, 'VerticalAlignment', 'top', 'FontSize', 10, 'Interpreter', 'tex');
 end
