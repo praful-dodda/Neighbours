@@ -37,7 +37,10 @@ grid_data.Z(nan_mask) = NaN;
 % Test point in middle of grid
 p0 = [-95, 27.5, 12];
 nmax = 30;
-dmax = [5.0, 6.0, 0.5];
+% dmax = [max_spatial_km, max_temporal, spacetime_weight_km_per_time]
+% Grid spacing ~1.8° lon × 0.9° lat ≈ 177km × 100km per cell
+% Use 500 km to get several grid cells
+dmax = [500.0, 6.0, 0.5];
 
 tic;
 [psub, zsub, dsub, nsub, index] = neighbours_stug_index(p0, grid_data, nmax, dmax);
@@ -155,7 +158,9 @@ for ratio = anisotropy_ratios
     % Test point
     p0_test = [0, 0, 6];
 
-    [psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, aniso_data, 20, [10.0, 3.0, 0.5]);
+    % Grid spacing: 100 points over 360° = 3.6° ≈ 400 km at equator
+    % Use 1000 km to get multiple cells
+    [psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, aniso_data, 20, [1000.0, 3.0, 0.5]);
 
     % Check grid spacing
     dx = median(diff(aniso_data.x));
@@ -203,7 +208,9 @@ for nan_ratio = nan_ratios
     base_data.Z(nan_mask) = NaN;
 
     tic;
-    [psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, base_data, 25, [5.0, 6.0, 0.5]);
+    % Grid spacing: 150 points over 360° = 2.4° ≈ 267 km at equator
+    % Use 800 km to get several cells
+    [psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, base_data, 25, [800.0, 6.0, 0.5]);
     time_elapsed = toc;
 
     fprintf('  NaN ratio %.0f%%: Found %d neighbors in %.4f sec', nan_ratio*100, nsub, time_elapsed);
@@ -242,7 +249,8 @@ for i = 1:size(outside_points, 1)
     p0_test = outside_points(i, :);
 
     try
-        [psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, grid_data, 15, [10.0, 5.0, 0.5]);
+        % Use same dmax as test 1 (grid_data is from test 1)
+        [psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, grid_data, 15, [500.0, 5.0, 0.5]);
         fprintf('  Point %d: Found %d neighbors - ✓ No error\n', i, nsub);
     catch e
         fprintf('  Point %d: Error - %s\n', i, e.message);
@@ -275,7 +283,9 @@ sparse_data.Z(nan_mask) = NaN;
 p0_test = [0, 0, 12];
 
 tic;
-[psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, sparse_data, 15, [10.0, 6.0, 0.5]);
+% Grid spacing: 200 points over 360° = 1.8° ≈ 200 km at equator
+% Use larger radius for sparse data to ensure finding neighbors
+[psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, sparse_data, 15, [1000.0, 6.0, 0.5]);
 time_elapsed = toc;
 
 fprintf('  Found %d neighbors in %.4f seconds\n', nsub, time_elapsed);
@@ -334,7 +344,9 @@ dense_data.Z = randn(length(dense_data.x), length(dense_data.y), length(dense_da
 p0_test = [0, 0, 12];
 
 tic;
-[psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, dense_data, 30, [5.0, 6.0, 0.5]);
+% Grid spacing: 300 points over 360° = 1.2° ≈ 133 km at equator
+% Use 600 km to get several cells
+[psub, zsub, dsub, nsub, ~] = neighbours_stug_index(p0_test, dense_data, 30, [600.0, 6.0, 0.5]);
 time_elapsed = toc;
 
 fprintf('  Found %d neighbors in %.4f seconds\n', nsub, time_elapsed);
