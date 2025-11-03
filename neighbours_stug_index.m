@@ -9,8 +9,11 @@ function [psub, zsub, dsub, nsub, index] = neighbours_stug_index(p0, grid_data, 
 %   grid_data  struct         Structure with grid data
 %              Must contain: .x, .y, .time, .Lon, .Lat, .Z
 %   nmax       scalar         maximum number of neighbors to return
-%   dmax       1 by 3         [max_spatial_dist_km, max_temporal_dist, spacetime_weight_km_per_timeunit]
-%                            Set to 0 for no constraint in that dimension
+%   dmax       1 by 3         [max_spatial_dist_deg, max_temporal_dist, spacetime_weight_deg_per_timeunit]
+%                            Spatial distances are specified in degrees (lon/lat)
+%                            and will be converted internally to kilometers for
+%                            distance computations. Set element to 0 for no
+%                            constraint in that dimension.
 %
 % OUTPUT:
 %   psub       m by 6         [lon, lat, time, idx_x, idx_y, idx_t] for m neighbors
@@ -119,11 +122,26 @@ if nmax > total_cells
 end
 
 % Parse distance constraints and spacetime weight
-max_spatial_dist = dmax(1);    % km (0 = no limit)
+% NOTE: dmax(1) is provided in degrees (lon/lat). Convert to km for
+% internal Haversine computations. Similarly, spacetime weight (dmax(3)) is
+% expected in degrees per time unit and will be converted to km per time unit.
+max_spatial_deg = dmax(1);     % degrees (0 = no limit)
 max_temporal_dist = dmax(2);   % time units (0 = no limit)
 
+% Compute approximate km-per-degree at POI latitude for conversion
+km_per_deg_lon = 111.0 * cos(deg2rad(lat_poi));
+km_per_deg_lat = 111.0;
+avg_km_per_deg = mean([abs(km_per_deg_lon), km_per_deg_lat]);
+
+if max_spatial_deg > 0
+    max_spatial_dist = max_spatial_deg * avg_km_per_deg; % convert degrees -> km
+else
+    max_spatial_dist = 0;
+end
+
 if length(dmax) >= 3 && dmax(3) > 0
-    spacetime_weight = dmax(3);  % km per time unit
+    % spacetime weight provided in degrees per time unit -> convert to km per time unit
+    spacetime_weight = dmax(3) * avg_km_per_deg;
 else
     spacetime_weight = 0;
 end
